@@ -79,6 +79,8 @@ jobs:
         login-server: ${{ env.CONTAINER_REGISTRY }}
         username: ${{ env.CONTAINER_REGISTRY_USERNAME }}
         password: ${{ env.CONTAINER_REGISTRY_PASSWORD }}
+    - name: Permissions to mvnw
+      run: chmod +x mvnw
     - name: Build and package the application
       run: ./mvnw package -Pprod verify jib:build -Djib.to.image=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
 
