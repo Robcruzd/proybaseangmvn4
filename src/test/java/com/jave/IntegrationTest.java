@@ -1,6 +1,5 @@
 package com.jave;
 
-import com.jave.Proybaseangmvn4App;
 import com.jave.config.AsyncSyncConfiguration;
 import com.jave.config.EmbeddedSQL;
 import java.lang.annotation.ElementType;

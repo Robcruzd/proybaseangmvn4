@@ -1,0 +1,120 @@
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+name: Application CI
+on: 
+  push:
+    branches:
+      - feature/githubactions
+  pull_request:
+    branches:
+      - feature/githubactions
+env:
+  NODE_VERSION: 16.17.0
+  CONTAINER_REGISTRY: proybaseazcr.azurecr.io
+  IMAGE_REPOSITORY: proybase_image
+  TAG: ${{ github.run_number }}
+  # AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} 
+  CONTAINER_REGISTRY_USERNAME: proybaseazcr
+  CONTAINER_REGISTRY_PASSWORD: n4yPSHC3s9lxYOfGXB3joVxVOssE7+vfrXcLGuGFr5+ACRDQeGic
+  AZURE_CLIENT_ID: "ab795cd7-5b59-4d1d-afb2-fa04b04db278"
+  AZURE_CLIENT_SECRET: "I5K8Q~e14r-IQ9sVcSeWD7g1TzqGLm8zrX8Rjadh"
+  AZURE_TENANT_ID: "adce66e5-0a46-4c70-b26c-98866bb294ea"
+  SUBSCRIPTION_ID: "8161c636-4f8c-4db8-b758-6fefca0524e6"
+  RESOURCE_GROUP: proybase
+  CLUSTER_NAME: proybasecluster
+jobs:
+  # test:
+  #   name: proybaseangmvn3 pipeline
+  #   runs-on: ubuntu-latest
+  #   if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.pull_request.title, '[skip ci]') && !contains(github.event.pull_request.title, '[ci skip]')"
+  #   timeout-minutes: 40
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #     - uses: actions/setup-java@v3
+  #       with:
+  #         distribution: 'temurin'
+  #         java-version: 17
+  #     - name: Install node.js packages
+  #       run: npm install
+  #     - name: Run backend test
+  #       run: |
+  #         chmod +x mvnw
+  #         npm run ci:backend:test
+  #     - name: Run frontend test
+  #       run: npm run ci:frontend:test
+  #     - name: Package application
+  #       run: npm run java:jar:prod
+  #     - name: 'E2E: Package'
+  #       run: npm run ci:e2e:package
+  #     - name: 'E2E: Prepare'
+  #       run: npm run ci:e2e:prepare
+  #     - name: 'E2E: Run'
+  #       run: npm run ci:e2e:run
+  #       env:
+  #         CYPRESS_ENABLE_RECORD: false
+  #         CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+  #         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  #     - name: 'E2E: Teardown'
+  #       run: npm run ci:e2e:teardown
+
+  build:
+    # needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Maven Package
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: 17
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.CONTAINER_REGISTRY }}
+        username: ${{ env.CONTAINER_REGISTRY_USERNAME }}
+        password: ${{ env.CONTAINER_REGISTRY_PASSWORD }}
+    - name: Build and package the application
+      run: ./mvnw package -Pprod verify jib:build -Djib.to.image=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
+
+# value: duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL
+# secretid: a50f264d-9544-4c50-90cc-676648864a8c
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '{"clientId":"7eecbc41-597f-48fc-9ddf-76f43f819d05","clientSecret":"duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL","subscriptionId":"b4393866-4e3f-451d-af0d-c3782d16f427","tenantId":"642abfe9-8349-406e-a44c-45336e1e0e3c"}'
+      - name: Set AKS context
+        id: set-context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: '${{ env.RESOURCE_GROUP }}' 
+          cluster-name: '${{ env.CLUSTER_NAME }}'
+      - name: Setup kubectl
+        id: install-kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Deploy to AKS
+        id: deploy-aks
+        uses: Azure/k8s-deploy@v4
+        with:
+          working-directory: ${{ github.workspace }}
+          namespace: 'default'
+          manifests: |
+            .github/manifests/deployment.yml
+            .github/manifests/service.yml
+          images: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
+          pull-images: false 
+      - name: Azure logout
+        run: |
+          az logout
