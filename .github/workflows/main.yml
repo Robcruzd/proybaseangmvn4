@@ -62,33 +62,33 @@ jobs:
   #     - name: 'E2E: Teardown'
   #       run: npm run ci:e2e:teardown
 
-  # build:
-  #   # needs: test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v3
-  #   - name: Maven Package
-  #     uses: actions/setup-java@v3
-  #     with:
-  #       distribution: 'temurin'
-  #       java-version: 17
-  #   - name: Login to Azure Container Registry
-  #     uses: azure/docker-login@v1
-  #     with:
-  #       login-server: ${{ env.CONTAINER_REGISTRY }}
-  #       username: ${{ env.CONTAINER_REGISTRY_USERNAME }}
-  #       password: ${{ env.CONTAINER_REGISTRY_PASSWORD }}
-  #   - name: Permissions to mvnw
-  #     run: chmod +x mvnw
-  #   - name: Build and package the application
-  #     run: ./mvnw package -Pprod verify jib:build -Djib.to.image=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
+  build:
+    # needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Maven Package
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: 17
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.CONTAINER_REGISTRY }}
+        username: ${{ env.CONTAINER_REGISTRY_USERNAME }}
+        password: ${{ env.CONTAINER_REGISTRY_PASSWORD }}
+    - name: Permissions to mvnw
+      run: chmod +x mvnw
+    - name: Build and package the application
+      run: ./mvnw package -Pprod verify jib:build -Djib.to.image=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
 
 # value: duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL
 # secretid: a50f264d-9544-4c50-90cc-676648864a8c
   deploy:
     name: Deploy
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest 
     steps:
       - name: Checkout code
@@ -115,7 +115,7 @@ jobs:
           manifests: |
             .github/manifests/deployment.yml
             .github/manifests/service.yml
-          images: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:71
+          images: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ env.TAG }}
           pull-images: false 
       - name: Azure logout
         run: |
