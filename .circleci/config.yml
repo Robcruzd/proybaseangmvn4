@@ -71,6 +71,7 @@ jobs:
       - run: 
           name: Generate JAR
           command: |
+            chmod +x mvnw
             export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
             npm run java:jar:prod
       - persist_to_workspace:
