@@ -24,46 +24,47 @@ env:
   SUBSCRIPTION_ID: "8161c636-4f8c-4db8-b758-6fefca0524e6"
   RESOURCE_GROUP: proybase
   CLUSTER_NAME: proybasecluster
+  CREDS_LOGIN: '{"clientId":"7eecbc41-597f-48fc-9ddf-76f43f819d05","clientSecret":"duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL","subscriptionId":"b4393866-4e3f-451d-af0d-c3782d16f427","tenantId":"642abfe9-8349-406e-a44c-45336e1e0e3c"}'
 jobs:
-  # test:
-  #   name: proybaseangmvn3 pipeline
-  #   runs-on: ubuntu-latest
-  #   if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.pull_request.title, '[skip ci]') && !contains(github.event.pull_request.title, '[ci skip]')"
-  #   timeout-minutes: 40
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
-  #     - uses: actions/setup-java@v3
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: 17
-  #     - name: Install node.js packages
-  #       run: npm install
-  #     - name: Run backend test
-  #       run: |
-  #         chmod +x mvnw
-  #         npm run ci:backend:test
-  #     - name: Run frontend test
-  #       run: npm run ci:frontend:test
-  #     - name: Package application
-  #       run: npm run java:jar:prod
-  #     - name: 'E2E: Package'
-  #       run: npm run ci:e2e:package
-  #     - name: 'E2E: Prepare'
-  #       run: npm run ci:e2e:prepare
-  #     - name: 'E2E: Run'
-  #       run: npm run ci:e2e:run
-  #       env:
-  #         CYPRESS_ENABLE_RECORD: false
-  #         CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-  #         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-  #     - name: 'E2E: Teardown'
-  #       run: npm run ci:e2e:teardown
+  test:
+    name: proybaseangmvn3 pipeline
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.pull_request.title, '[skip ci]') && !contains(github.event.pull_request.title, '[ci skip]')"
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Install node.js packages
+        run: npm install
+      - name: Run backend test
+        run: |
+          chmod +x mvnw
+          npm run ci:backend:test
+      - name: Run frontend test
+        run: npm run ci:frontend:test
+      - name: Package application
+        run: npm run java:jar:prod
+      - name: 'E2E: Package'
+        run: npm run ci:e2e:package
+      - name: 'E2E: Prepare'
+        run: npm run ci:e2e:prepare
+      - name: 'E2E: Run'
+        run: npm run ci:e2e:run
+        env:
+          CYPRESS_ENABLE_RECORD: false
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      - name: 'E2E: Teardown'
+        run: npm run ci:e2e:teardown
 
   build:
-    # needs: test
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -96,7 +97,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: '{"clientId":"7eecbc41-597f-48fc-9ddf-76f43f819d05","clientSecret":"duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL","subscriptionId":"b4393866-4e3f-451d-af0d-c3782d16f427","tenantId":"642abfe9-8349-406e-a44c-45336e1e0e3c"}'
+          creds: ${{ env.CREDS_LOGIN}}
       - name: Set AKS context
         id: set-context
         uses: azure/aks-set-context@v3
