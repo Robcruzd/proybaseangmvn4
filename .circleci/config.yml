@@ -59,56 +59,45 @@ jobs:
       # - run:
       #     name: 'E2E: Teardown'
       #     command: npm run ci:e2e:teardown
-  # deliver:
-  #   environment:
-  #     CONTAINER_REGISTRY_PASSWORD: n4yPSHC3s9lxYOfGXB3joVxVOssE7+vfrXcLGuGFr5+ACRDQeGic
-  #     CONTAINER_REGISTRY: proybaseazcr.azurecr.io
-  #     CONTAINER_REGISTRY_USERNAME: proybaseazcr
-  #     IMAGE_REPOSITORY: proybase_image
-  #     TAG: $CIRCLE_TAG
-  #   machine:
-  #     image: ubuntu-2004:current
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install Java 17
-  #         command: |
-  #           sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
-  #     - run:
-  #         name: Login to Azure Container Registry
-  #         command: |
-  #           echo $CONTAINER_REGISTRY_PASSWORD | docker login $CONTAINER_REGISTRY --username $CONTAINER_REGISTRY_USERNAME --password-stdin
-  #     - run:
-  #         name: Build and package the application
-  #         command: |
-  #           ./mvnw package -Pprod verify jib:build -Djib.to.image=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID
+  deliver:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run:
+          name: Install Java 17
+          command: |
+            sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
+      - run: 
+          name: Generate JAR
+          command: |
+            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
+            npm run java:jar:prod
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target/proybaseangmvn-3-0.0.1-SNAPSHOT.jar
+      - store_artifacts:
+          path: target/proybaseangmvn-3-0.0.1-SNAPSHOT.jar
 
-  # deploy:
-  #   environment:
-  #     AZURE_CLIENT_ID: 7eecbc41-597f-48fc-9ddf-76f43f819d05
-  #     AZURE_CLIENT_SECRET: OlO8Q~Xm3AFupexm8mkIC1C5s_omzpM.oXbP7drr
-  #     AZURE_TENANT_ID: 642abfe9-8349-406e-a44c-45336e1e0e3c
-  #     AZURE_RESOURCE_GROUP: proybase
-  #     AZURE_APP_SERVICE_PLAN: proybaseappservplan
-  #     AZURE_APP_NAME: proybaseappservcon
-  #     CONTAINER_REGISTRY: proybaseazcr.azurecr.io
-  #     IMAGE_REPOSITORY: proybase_image
-  #     TAG: $CIRCLE_TAG
-  #   docker:
-  #     - image: "mcr.microsoft.com/azure-cli"
-  #   steps:
-  #     - attach_workspace:
-  #         at: .
-  #     - run:
-  #         name: Authenticate with Azure
-  #         command: |
-  #           az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-  #     - run:
-  #         name: Azure Web App on Container Deploy
-  #         command: az webapp create --resource-group "$AZURE_RESOURCE_GROUP" --plan "$AZURE_APP_SERVICE_PLAN" --name "$AZURE_APP_NAME" --deployment-container-image-name "$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID"
-  #     - run:
-  #         name: Azure logout
-  #         command: az logout
+  deploy:
+    environment:
+      AZURE_CLIENT_ID: 7eecbc41-597f-48fc-9ddf-76f43f819d05
+      AZURE_CLIENT_SECRET: OlO8Q~Xm3AFupexm8mkIC1C5s_omzpM.oXbP7drr
+      AZURE_TENANT_ID: 642abfe9-8349-406e-a44c-45336e1e0e3c
+    docker:
+      - image: "mcr.microsoft.com/azure-cli"
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Authenticate with Azure
+          command: |
+            az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+      - run:
+          name: Deploy to Azure
+          command: |
+            az webapp deploy --resource-group proybase --name proybaseappserv --src-path $(find . -name "proy*.jar") --type jar --verbose
 
 workflows:
   version: 2
@@ -119,15 +108,15 @@ workflows:
                 branches:
                     only:
                         - feature/circleci
-      # - deliver:
-      #     filters:
-      #         branches:
-      #             only:
-      #                 - feature/circleci
-      # - deploy:
-      #     requires:
-      #         - deliver
-      #     filters:
-      #         branches:
-      #             only:
-      #                 - feature/circleci
+      - deliver:
+          filters:
+              branches:
+                  only:
+                      - feature/circleci
+      - deploy:
+          requires:
+              - deliver
+          filters:
+              branches:
+                  only:
+                      - feature/circleci
