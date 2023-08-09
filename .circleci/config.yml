@@ -76,6 +76,9 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
       - run:
+          name: Give Executable Power
+          command: 'chmod +x mvnw'
+      - run:
           name: Login to Azure Container Registry
           command: |
             echo $CONTAINER_REGISTRY_PASSWORD | docker login $CONTAINER_REGISTRY --username $CONTAINER_REGISTRY_USERNAME --password-stdin
