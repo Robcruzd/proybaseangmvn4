@@ -95,6 +95,7 @@ jobs:
       AZURE_RESOURCE_GROUP: proybase
       AZURE_APP_SERVICE_PLAN: proybaseappservplan
       CLUSTER_NAME: proybasecluster
+      CONTAINER_REGISTRY_USERNAME: proybaseazcr
       CONTAINER_REGISTRY: proybaseazcr.azurecr.io
       IMAGE_REPOSITORY: proybase_image
       TAG: $CIRCLE_TAG
@@ -117,7 +118,7 @@ jobs:
           name: Deploy to AKS
           command: |
             kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
-            kubectl set image deployment/robcruzdproybaseangmvn my-container=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID
+            kubectl set image deployment/robcruzdproybaseangmvn $CONTAINER_REGISTRY_USERNAME=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID
       - run:
           name: Azure logout
           command: az logout
