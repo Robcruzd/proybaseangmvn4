@@ -99,7 +99,7 @@ jobs:
       IMAGE_REPOSITORY: proybase_image
       TAG: $CIRCLE_TAG
     machine:
-      image: ubuntu-2004:latest
+      image: ubuntu-2004:current
     steps:
       - checkout
       - run:
