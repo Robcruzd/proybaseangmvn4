@@ -86,33 +86,6 @@ jobs:
           name: Build and package the application
           command: |
             ./mvnw package -Pprod verify jib:build -Djib.to.image=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID
-
-  deploy:
-    environment:
-      AZURE_CLIENT_ID: 7eecbc41-597f-48fc-9ddf-76f43f819d05
-      AZURE_CLIENT_SECRET: duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL
-      AZURE_TENANT_ID: 642abfe9-8349-406e-a44c-45336e1e0e3c
-      AZURE_RESOURCE_GROUP: proybase
-      AZURE_APP_SERVICE_PLAN: proybaseappservplan
-      AZURE_APP_NAME: proybaseappservcon
-      CONTAINER_REGISTRY: proybaseazcr.azurecr.io
-      IMAGE_REPOSITORY: proybase_image
-      TAG: $CIRCLE_TAG
-    docker:
-      - image: "mcr.microsoft.com/azure-cli"
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Authenticate with Azure
-          command: |
-            az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-      - run:
-          name: Azure Web App on Container Deploy
-          command: az webapp create --resource-group "$AZURE_RESOURCE_GROUP" --plan "$AZURE_APP_SERVICE_PLAN" --name "$AZURE_APP_NAME" --deployment-container-image-name "$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID"
-      - run:
-          name: Azure logout
-          command: az logout
   
   deploy:
     environment:
