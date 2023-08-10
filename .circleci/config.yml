@@ -1,64 +1,64 @@
 version: 2.1
 jobs:
-  build_test:
-    machine:
-      image: ubuntu-2004:current
-    resource_class: large
-    steps:
-      - checkout
-      # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "package-lock.json" }}
-      #       - v1-dependencies-
-      - run:
-          name: Install Java 17
-          command: |
-            sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
-      - run:
-          name: Set Java 17 as default
-          command: sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
-      - run:
-          name: Print Node Version
-          command: 'node -v'
-      - run:
-          name: Print NPM Version
-          command: 'npm -v'
-      - run:
-          name: Install Node Modules
-          command: 'npm install'
-      - save_cache:
-          paths:
-            - node
-            - node_modules
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "package-lock.json" }}
+  # build_test:
+  #   machine:
+  #     image: ubuntu-2004:current
+  #   resource_class: large
+  #   steps:
+  #     - checkout
+  #     # Download and cache dependencies
+  #     # - restore_cache:
+  #     #     keys:
+  #     #       - v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "package-lock.json" }}
+  #     #       - v1-dependencies-
+  #     - run:
+  #         name: Install Java 17
+  #         command: |
+  #           sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
+  #     - run:
+  #         name: Set Java 17 as default
+  #         command: sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+  #     - run:
+  #         name: Print Node Version
+  #         command: 'node -v'
+  #     - run:
+  #         name: Print NPM Version
+  #         command: 'npm -v'
+  #     - run:
+  #         name: Install Node Modules
+  #         command: 'npm install'
+  #     - save_cache:
+  #         paths:
+  #           - node
+  #           - node_modules
+  #           - ~/.m2
+  #         key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "package-lock.json" }}
 
-      - run:
-          name: Give Executable Power
-          command: 'chmod +x mvnw'
-      - run:
-          name: Backend tests
-          command: |
-            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
-            npm run ci:backend:test
-      - run:
-          name: Run Front End Tests
-          command: npm run ci:frontend:test
-      # - run:
-      #     name: 'E2E: Package'
-      #     command: npm run ci:e2e:package
-      # - run:
-      #     name: 'E2E: Prepare'
-      #     command: npm run ci:e2e:prepare
-      # - run:
-      #     name: 'E2E: Run'
-      #     command: npm run ci:e2e:run
-      #     environment:
-      #       CYPRESS_ENABLE_RECORD: false
-      # - run:
-      #     name: 'E2E: Teardown'
-      #     command: npm run ci:e2e:teardown
+  #     - run:
+  #         name: Give Executable Power
+  #         command: 'chmod +x mvnw'
+  #     - run:
+  #         name: Backend tests
+  #         command: |
+  #           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
+  #           npm run ci:backend:test
+  #     - run:
+  #         name: Run Front End Tests
+  #         command: npm run ci:frontend:test
+  #     # - run:
+  #     #     name: 'E2E: Package'
+  #     #     command: npm run ci:e2e:package
+  #     # - run:
+  #     #     name: 'E2E: Prepare'
+  #     #     command: npm run ci:e2e:prepare
+  #     # - run:
+  #     #     name: 'E2E: Run'
+  #     #     command: npm run ci:e2e:run
+  #     #     environment:
+  #     #       CYPRESS_ENABLE_RECORD: false
+  #     # - run:
+  #     #     name: 'E2E: Teardown'
+  #     #     command: npm run ci:e2e:teardown
 
   deliver:
     environment:
@@ -113,16 +113,47 @@ jobs:
       - run:
           name: Azure logout
           command: az logout
+  
+  deploy:
+    environment:
+      AZURE_CLIENT_ID: 7eecbc41-597f-48fc-9ddf-76f43f819d05
+      AZURE_CLIENT_SECRET: duU8Q~B6u3Di2fXKdndbkeeZM1Jz8f8v6xTt8aPL
+      AZURE_TENANT_ID: 642abfe9-8349-406e-a44c-45336e1e0e3c
+      AZURE_RESOURCE_GROUP: proybase
+      AZURE_APP_SERVICE_PLAN: proybaseappservplan
+      CLUSTER_NAME: proybasecluster
+      CONTAINER_REGISTRY: proybaseazcr.azurecr.io
+      IMAGE_REPOSITORY: proybase_image
+      TAG: $CIRCLE_TAG
+    docker:
+      - image: "mcr.microsoft.com/azure-cli"
+    steps:
+      - checkout
+      - run:
+          name: Authenticate with Azure
+          command: |
+            az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+      - run:
+          name: Set AKS context
+          command: az aks get-credentials --resource-group "$AZURE_RESOURCE_GROUP" --name "$CLUSTER_NAME"
+      - run:
+          name: Deploy to AKS
+          command: |
+            kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
+            kubectl set image deployment/my-deployment my-container=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$TAG
+      - run:
+          name: Azure logout
+          command: az logout
 
 workflows:
   version: 2
   sample:
     jobs:
-      - build_test:
-            filters:
-                branches:
-                    only:
-                        - feature/circleci
+      # - build_test:
+      #       filters:
+      #           branches:
+      #               only:
+      #                   - feature/circleci
       - deliver:
           filters:
               branches:
