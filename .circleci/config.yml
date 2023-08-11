@@ -85,7 +85,7 @@ jobs:
       - run:
           name: Build and package the application
           command: |
-            ./mvnw package -Pprod verify jib:build -Djib.to.image=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$TAG
+            ./mvnw package -Pprod verify jib:build -Djib.to.image=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID
   
   deploy:
     environment:
@@ -124,7 +124,7 @@ jobs:
           name: Deploy to AKS
           command: |
             kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
-            kubectl set image deployment/robcruzdproybaseangmvn $CONTAINER_REGISTRY_USERNAME=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$TAG
+            kubectl set image deployment/robcruzdproybaseangmvn $CONTAINER_REGISTRY_USERNAME=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:$CIRCLE_WORKFLOW_ID
       - run:
           name: Azure logout
           command: az logout
