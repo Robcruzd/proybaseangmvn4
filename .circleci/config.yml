@@ -118,7 +118,7 @@ jobs:
           name: Deploy to AKS
           command: |
             kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
-            kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:7
+            kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr=proybaseazcr.azurecr.io/proybase_image:7
       - run:
           name: Azure logout
           command: az logout
