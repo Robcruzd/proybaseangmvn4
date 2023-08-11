@@ -100,14 +100,17 @@ jobs:
       CONTAINER_REGISTRY_PASSWORD: n4yPSHC3s9lxYOfGXB3joVxVOssE7+vfrXcLGuGFr5+ACRDQeGic
       IMAGE_REPOSITORY: proybase_image
       TAG: $CIRCLE_TAG
-    docker:
-      - image: "mcr.microsoft.com/azure-cli"
+    machine:
+      image: ubuntu-2004:current
     steps:
       - checkout
       - run:
-          name: Install kubectl
+          name: Install az y kubectl
           command: |
-            az aks install-cli
+            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
       - run:
           name: Authenticate with Azure
           command: |
