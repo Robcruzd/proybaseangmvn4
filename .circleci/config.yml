@@ -113,7 +113,9 @@ jobs:
             sudo mv ./kubectl /usr/local/bin/kubectl
       - run:
           name: Login container
-          command: echo "${CONTAINER_REGISTRY_PASSWORD}" | docker login --username ${CONTAINER_REGISTRY_USERNAME} --password-stdin ${CONTAINER_REGISTRY}
+          command: |
+            echo "${CONTAINER_REGISTRY_PASSWORD}"
+            docker login --username ${CONTAINER_REGISTRY_USERNAME} --password-stdin ${CONTAINER_REGISTRY}
       - run:
           name: Authenticate with Azure
           command: |
