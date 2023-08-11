@@ -13,7 +13,7 @@ spec:
         app: robcruzdproybaseangmvn 
     spec:
       containers:
-        - name: proybaseangmvn
+        - name: proybaseazcr
           image: proybaseazcr.azurecr.io/proybase_image
           ports:
           - containerPort: 80
