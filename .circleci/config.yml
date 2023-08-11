@@ -97,6 +97,7 @@ jobs:
       CLUSTER_NAME: proybasecluster
       CONTAINER_REGISTRY_USERNAME: proybaseazcr
       CONTAINER_REGISTRY: proybaseazcr.azurecr.io
+      CONTAINER_REGISTRY_PASSWORD: n4yPSHC3s9lxYOfGXB3joVxVOssE7+vfrXcLGuGFr5+ACRDQeGic
       IMAGE_REPOSITORY: proybase_image
       TAG: $CIRCLE_TAG
     docker:
@@ -111,6 +112,9 @@ jobs:
           name: Authenticate with Azure
           command: |
             az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+      - run:
+          name: Login container
+          command: echo "${CONTAINER_REGISTRY_PASSWORD}" | docker login --username ${CONTAINER_REGISTRY_USERNAME} --password-stdin ${CONTAINER_REGISTRY}
       - run:
           name: Set AKS context
           command: az aks get-credentials --resource-group "$AZURE_RESOURCE_GROUP" --name "$CLUSTER_NAME"
