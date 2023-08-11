@@ -116,17 +116,19 @@ jobs:
           command: echo "${CONTAINER_REGISTRY_PASSWORD}" | docker login --username ${CONTAINER_REGISTRY_USERNAME} --password-stdin ${CONTAINER_REGISTRY}
       - run:
           name: Authenticate with Azure
-          command: |
-            kubectl get deployment proybasecluster -o yaml
-            az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+          command: az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
       - run:
           name: Set AKS context
           command: az aks get-credentials --resource-group "$AZURE_RESOURCE_GROUP" --name "$CLUSTER_NAME"
       - run:
           name: Deploy to AKS
-          command: |
-            kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
-            kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr=proybaseazcr.azurecr.io/proybase_image:ddb51feb-aae9-4413-a2c2-96ef9ded9209
+          command: kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
+      - run:
+          name: get deploy
+          command: kubectl get deployment proybasecluster -o yaml
+      - run:
+          name: Deploy to AKS
+          command: kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr=proybaseazcr.azurecr.io/proybase_image:ddb51feb-aae9-4413-a2c2-96ef9ded9209
       - run:
           name: Azure logout
           command: az logout
