@@ -121,13 +121,16 @@ jobs:
           name: Set AKS context
           command: az aks get-credentials --resource-group "$AZURE_RESOURCE_GROUP" --name "$CLUSTER_NAME"
       - run:
-          name: Deploy to AKS
+          name: Deploy to AKS1
           command: kubectl apply -f .circleci/manifests/deployment.yml -f .circleci/manifests/service.yml
       - run:
           name: get deploy
-          command: kubectl get deployment proybasecluster -o yaml
+          command: kubectl get deployments
       - run:
-          name: Deploy to AKS
+          name: get deploy
+          command: kubectl get pods --show-labels
+      - run:
+          name: Deploy to AKS2
           command: kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr=proybaseazcr.azurecr.io/proybase_image:ddb51feb-aae9-4413-a2c2-96ef9ded9209
       - run:
           name: Azure logout
