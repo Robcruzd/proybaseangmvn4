@@ -131,7 +131,7 @@ jobs:
           command: kubectl get pods --show-labels
       - run:
           name: Deploy to AKS2
-          command: kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr=proybaseazcr.azurecr.io/proybase_image:ddb51feb-aae9-4413-a2c2-96ef9ded9209
+          command: kubectl set image deployment/robcruzdproybaseangmvn proybaseazcr.azurecr.io/proybase_image:ddb51feb-aae9-4413-a2c2-96ef9ded9209
       - run:
           name: Azure logout
           command: az logout
