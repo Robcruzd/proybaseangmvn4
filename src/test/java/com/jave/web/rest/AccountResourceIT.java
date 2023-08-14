@@ -14,7 +14,6 @@ import com.jave.security.AuthoritiesConstants;
 import com.jave.service.UserService;
 import com.jave.service.dto.AdminUserDTO;
 import com.jave.service.dto.PasswordChangeDTO;
-import com.jave.service.dto.UserDTO;
 import com.jave.web.rest.vm.KeyAndPasswordVM;
 import com.jave.web.rest.vm.ManagedUserVM;
 import java.time.Instant;
