@@ -83,6 +83,7 @@
 
 
 node {
+    agent any
 
     stage('config image') {
         agent {
