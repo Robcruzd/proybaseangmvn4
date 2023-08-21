@@ -83,12 +83,22 @@
 
 
 node {
+
+    stage('config image') {
+        agent {
+                docker {
+                    image 'ubuntu:20.04'
+                    args '-v /usr/share/maven/ref/repository:/root/.m2/repository'
+                }
+            }
+    }
+
     stage('checkout') {
         checkout scm
     }
 
     stage('install java 17') {
-        sh 'sudo apt-get update && apt-get install -y openjdk-17-jdk'
+        sh 'apt-get update && apt-get install -y openjdk-17-jdk'
     }
 
     stage('actualizar java_home') {
