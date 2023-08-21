@@ -91,6 +91,12 @@ node {
                     args '-v /usr/share/maven/ref/repository:/root/.m2/repository'
                 }
             }
+        steps {
+            checkout scm
+            sh 'apt-get update && apt-get install -y openjdk-17-jdk'
+            sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
+            sh "java -version"
+        }
     }
 
     stage('checkout') {
