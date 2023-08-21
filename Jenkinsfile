@@ -87,6 +87,14 @@ node {
         checkout scm
     }
 
+    stage('install java 17') {
+        sh 'apt-get update && apt-get install -y openjdk-17-jdk'
+    }
+
+    stage('actualizar java_home') {
+        sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
+    }
+
     stage('check java') {
         sh "java -version"
     }
@@ -108,7 +116,7 @@ node {
     }
     stage('backend tests') {
         try {
-            sh "npm run ci:backend:test"
+            sh "./mvnw -ntp verify -P-webapp"
         } catch(err) {
             throw err
         } finally {
@@ -118,7 +126,7 @@ node {
 
     stage('frontend tests') {
         try {
-            sh "npm run ci:frontend:test'"
+            sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
         } catch(err) {
             throw err
         } finally {
