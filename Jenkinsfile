@@ -88,7 +88,7 @@ node {
     }
 
     stage('install java 17') {
-        sh 'apt-get update && apt-get install -y openjdk-17-jdk'
+        sh 'sudo apt-get update && apt-get install -y openjdk-17-jdk'
     }
 
     stage('actualizar java_home') {
