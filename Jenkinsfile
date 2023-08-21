@@ -83,37 +83,17 @@
 
 
 node {
-    agent any
 
-    stage('config image') {
-        agent {
-                docker {
-                    image 'ubuntu:20.04'
-                    args '-v /usr/share/maven/ref/repository:/root/.m2/repository'
-                }
-            }
-        steps {
-            checkout scm
-            sh 'apt-get update && apt-get install -y openjdk-17-jdk'
-            sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
-            sh "java -version"
-        }
-    }
+    // Define el nombre de la herramienta JDK para Java 17
+    def jdk17 = tool(name: 'JDK 17', type: 'hudson.model.JDK')
 
     stage('checkout') {
         checkout scm
     }
 
-    stage('install java 17') {
-        sh 'apt-get update && apt-get install -y openjdk-17-jdk'
-    }
-
-    stage('actualizar java_home') {
-        sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
-    }
-
     stage('check java') {
-        sh "java -version"
+        // Verificar la versión de Java 17
+        sh "${jdk17}/bin/java -version"
     }
 
     stage('clean') {
