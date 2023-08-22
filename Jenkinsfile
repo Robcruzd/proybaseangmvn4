@@ -1,16 +1,15 @@
 #!/usr/bin/env groovy
 
 pipeline {
-    agent {any}
 
     stages {
         stage('Build and Test') {
-            agent {
-                docker {
-                    image 'ubuntu:20.04'
-                    args '-v /usr/share/maven/ref/repository:/root/.m2/repository'
-                }
-            }
+            // agent {
+            //     docker {
+            //         image 'ubuntu:20.04'
+            //         args '-v /usr/share/maven/ref/repository:/root/.m2/repository'
+            //     }
+            // }
             steps {
                 sh 'apt-get update && apt-get install -y openjdk-17-jdk'
                 sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
@@ -29,11 +28,11 @@ pipeline {
         }
 
         stage('Deliver') {
-            agent {
-                docker {
-                    image 'ubuntu:20.04'
-                }
-            }
+            // agent {
+            //     docker {
+            //         image 'ubuntu:20.04'
+            //     }
+            // }
             steps {
                 sh 'apt-get update && apt-get install -y openjdk-17-jdk'
                 sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
@@ -80,29 +79,6 @@ pipeline {
         }
     }
 }
-
-// pipeline {
-//     agent {
-//         docker {
-//             image 'ubuntu:latest'
-//         }
-//     }
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 checkout scm
-//             }
-//         }
-//         stage('Run Commands') {
-//             steps {
-//                 sh 'ls -la'
-//                 sh 'echo "Hello from Ubuntu"'
-//             }
-//         }
-//     }
-// }
-
-
 
 // node {
 
