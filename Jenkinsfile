@@ -108,8 +108,10 @@ node {
 
     // // Define el nombre de la herramienta JDK para Java 17
     // def jdk17 = tool(name: 'JDK 17', type: 'hudson.model.JDK')
-    agent any
-    
+    agent {
+        any
+    }
+
     stage('checkout') {
         checkout scm
     }
