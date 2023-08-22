@@ -21,8 +21,8 @@ pipeline {
                 sh "java -version"
                 // sh 'apt-get update && apt-get install -y openjdk-17-jdk'
                 // sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
-                sh 'node -v'
-                sh 'npm -v'
+                // sh 'node -v'
+                // sh 'npm -v'
                 sh "chmod +x mvnw"
                 sh "./mvnw -ntp clean -P-webapp"
                 sh "./mvnw -ntp checkstyle:check"
