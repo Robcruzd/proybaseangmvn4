@@ -4,6 +4,10 @@ pipeline {
     agent any
 
     stages {
+        stage('checkout') {
+            checkout scm
+        }
+
         stage('Build and Test') {
             // agent {
             //     docker {
@@ -12,14 +16,22 @@ pipeline {
             //     }
             // }
             steps {
-                sh 'apt-get update && apt-get install -y openjdk-17-jdk'
-                sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
+                sh "java -version"
+                // sh 'apt-get update && apt-get install -y openjdk-17-jdk'
+                // sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
                 sh 'node -v'
                 sh 'npm -v'
-                sh 'npm install'
-                sh 'chmod +x mvnw'
-                sh 'npm run ci:backend:test'
-                sh 'npm run ci:frontend:test'
+                sh "chmod +x mvnw"
+                sh "./mvnw -ntp clean -P-webapp"
+                sh "./mvnw -ntp checkstyle:check"
+                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
+                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
+                sh "./mvnw -ntp verify -P-webapp"
+                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
+                // sh 'npm install'
+                // sh 'chmod +x mvnw'
+                // sh 'npm run ci:backend:test'
+                // sh 'npm run ci:frontend:test'
             }
             post {
                 always {
