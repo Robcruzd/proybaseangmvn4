@@ -1,29 +1,14 @@
 #!/usr/bin/env groovy
 
-pipeline {
-    agent any
+node {
+    // agent any
 
     stages {
-        // stage('checkout') {
-        //     steps {
-        //         checkout scm
-        //     }
-        // }
 
         stage('Build and Test') {
-            // agent {
-            //     docker {
-            //         image 'ubuntu:20.04'
-            //         args '-v /usr/share/maven/ref/repository:/root/.m2/repository'
-            //     }
-            // }
             steps {
                 checkout scm
                 sh "java -version"
-                // sh 'apt-get update && apt-get install -y openjdk-17-jdk'
-                // sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
-                // sh 'node -v'
-                // sh 'npm -v'
                 sh "chmod +x mvnw"
                 sh "./mvnw -ntp clean -P-webapp"
                 sh "./mvnw -ntp checkstyle:check"
@@ -31,10 +16,6 @@ pipeline {
                 sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
                 sh "./mvnw -ntp verify -P-webapp"
                 sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
-                // sh 'npm install'
-                // sh 'chmod +x mvnw'
-                // sh 'npm run ci:backend:test'
-                // sh 'npm run ci:frontend:test'
             }
             post {
                 always {
