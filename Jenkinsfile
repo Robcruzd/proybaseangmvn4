@@ -4,11 +4,11 @@ pipeline {
     agent any
 
     stages {
-        stage('checkout') {
-            steps {
-                checkout scm
-            }
-        }
+        // stage('checkout') {
+        //     steps {
+        //         checkout scm
+        //     }
+        // }
 
         stage('Build and Test') {
             // agent {
@@ -18,6 +18,7 @@ pipeline {
             //     }
             // }
             steps {
+                checkout scm
                 sh "java -version"
                 // sh 'apt-get update && apt-get install -y openjdk-17-jdk'
                 // sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
