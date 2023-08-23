@@ -3,7 +3,7 @@
 node {
     // agent any
 
-    stages {
+    // stages {
 
         stage('Build and Test') {
             steps {
@@ -65,16 +65,16 @@ node {
                 }
             }
         }
-    }
+    // }
 
-    post {
-        success {
-            echo 'Pipeline executed successfully'
-        }
-        failure {
-            echo 'Pipeline failed'
-        }
-    }
+    // post {
+    //     success {
+    //         echo 'Pipeline executed successfully'
+    //     }
+    //     failure {
+    //         echo 'Pipeline failed'
+    //     }
+    // }
 }
 
 // node {
