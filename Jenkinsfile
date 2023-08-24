@@ -26,11 +26,11 @@ pipeline {
                 // sh 'npm run ci:backend:test'
                 // sh 'npm run ci:frontend:test'
             }
-            post {
-                always {
-                    saveCache(key: 'v1-dependencies-${CHECKSUM}', paths: ['node', 'node_modules', '.m2'])
-                }
-            }
+            // post {
+            //     always {
+            //         saveCache(key: 'v1-dependencies-${CHECKSUM}', paths: ['node', 'node_modules', '.m2'])
+            //     }
+            // }
         }
 
         stage('Deliver') {
