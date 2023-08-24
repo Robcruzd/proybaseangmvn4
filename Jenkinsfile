@@ -1,9 +1,14 @@
 #!/usr/bin/env groovy
 
-node {
-    // agent any
+pipeline {
+    agent any
 
-    // stages {
+    stages {
+        // stage('checkout') {
+        //     steps {
+        //         checkout scm
+        //     }
+        // }
 
         stage('Build and Test') {
             steps {
@@ -16,6 +21,10 @@ node {
                 sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
                 sh "./mvnw -ntp verify -P-webapp"
                 sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
+                // sh 'npm install'
+                // sh 'chmod +x mvnw'
+                // sh 'npm run ci:backend:test'
+                // sh 'npm run ci:frontend:test'
             }
             post {
                 always {
@@ -65,16 +74,16 @@ node {
                 }
             }
         }
-    // }
+    }
 
-    // post {
-    //     success {
-    //         echo 'Pipeline executed successfully'
-    //     }
-    //     failure {
-    //         echo 'Pipeline failed'
-    //     }
-    // }
+    post {
+        success {
+            echo 'Pipeline executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
 }
 
 // node {
