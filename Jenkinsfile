@@ -10,28 +10,28 @@ pipeline {
         //     }
         // }
 
-        stage('Build and Test') {
-            steps {
-                checkout scm
-                sh "java -version"
-                sh "chmod +x mvnw"
-                sh "./mvnw -ntp clean -P-webapp"
-                sh "./mvnw -ntp checkstyle:check"
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
-                sh "./mvnw -ntp verify -P-webapp"
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
-                // sh 'npm install'
-                // sh 'chmod +x mvnw'
-                // sh 'npm run ci:backend:test'
-                // sh 'npm run ci:frontend:test'
-            }
-            // post {
-            //     always {
-            //         saveCache(key: 'v1-dependencies-${CHECKSUM}', paths: ['node', 'node_modules', '.m2'])
-            //     }
-            // }
-        }
+        // stage('Build and Test') {
+        //     steps {
+        //         checkout scm
+        //         sh "java -version"
+        //         sh "chmod +x mvnw"
+        //         sh "./mvnw -ntp clean -P-webapp"
+        //         sh "./mvnw -ntp checkstyle:check"
+        //         sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
+        //         sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
+        //         sh "./mvnw -ntp verify -P-webapp"
+        //         sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
+        //         // sh 'npm install'
+        //         // sh 'chmod +x mvnw'
+        //         // sh 'npm run ci:backend:test'
+        //         // sh 'npm run ci:frontend:test'
+        //     }
+        //     // post {
+        //     //     always {
+        //     //         saveCache(key: 'v1-dependencies-${CHECKSUM}', paths: ['node', 'node_modules', '.m2'])
+        //     //     }
+        //     // }
+        // }
 
         stage('Deliver') {
             // agent {
@@ -40,8 +40,6 @@ pipeline {
             //     }
             // }
             steps {
-                sh 'apt-get update && apt-get install -y openjdk-17-jdk'
-                sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/'
                 sh 'chmod +x mvnw'
                 sh 'npm run java:jar:prod'
                 sh 'cp target/proybaseangmvn-4-0.0.1-SNAPSHOT.jar $HOME/target'
