@@ -41,12 +41,12 @@ pipeline {
             // }
             steps {
                 sh 'chmod +x mvnw'
-                sh 'npm run java:jar:prod'
+                sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
                 sh 'cp target/proybaseangmvn-4-0.0.1-SNAPSHOT.jar $HOME/target'
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'target/proybaseangmvn-4-0.0.1-SNAPSHOT.jar', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
                 }
             }
         }
