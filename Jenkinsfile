@@ -57,16 +57,20 @@ pipeline {
                 AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
                 AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
             }
-            agent any
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/azure-cli'
+                }
+            }
             steps {
+                attachWorkspace()
                 script {
-                    def jarFile = findFiles(glob: 'target/proy*.jar').first()
                     withCredentials([string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
                                      string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
                                      string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')]) {
                         sh '''
                             az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-                            az webapp deploy --resource-group proybase --name proybaseappserv --src-path ${jarFile.directory} --type jar --verbose
+                            az webapp deploy --resource-group proybase --name proybaseappserv --src-path $(find . -name "proy*.jar") --type jar --verbose
                         '''
                     }
                 }
