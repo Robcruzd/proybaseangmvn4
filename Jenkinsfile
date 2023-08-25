@@ -42,13 +42,13 @@ pipeline {
             steps {
                 sh 'chmod +x mvnw'
                 sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
-                sh 'cp target/proybaseangmvn-4-0.0.1-SNAPSHOT.jar $HOME/target'
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             }
-            post {
-                always {
-                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-                }
-            }
+            // post {
+            //     always {
+            //         archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            //     }
+            // }
         }
 
         stage('Deploy') {
