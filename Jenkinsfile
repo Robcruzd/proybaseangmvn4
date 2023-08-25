@@ -59,7 +59,7 @@ pipeline {
             }
             agent any
             steps {
-                attachWorkspace()
+                // attachWorkspace()
                 script {
                     withCredentials([string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
                                      string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
