@@ -57,11 +57,7 @@ pipeline {
                 AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
                 AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
             }
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/azure-cli'
-                }
-            }
+            agent any
             steps {
                 attachWorkspace()
                 script {
