@@ -4,7 +4,6 @@ pipeline {
     agent any
 
     stages {
-        agent any
         // stage('checkout') {
         //     steps {
         //         checkout scm
@@ -12,6 +11,7 @@ pipeline {
         // }
 
         stage('Build and Test') {
+            agent any
             steps {
                 checkout scm
                 sh "java -version"
