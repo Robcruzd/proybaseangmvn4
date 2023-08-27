@@ -11,7 +11,6 @@ pipeline {
         // }
 
         stage('Build and Test') {
-            agent any
             steps {
                 checkout scm
                 sh "java -version"
