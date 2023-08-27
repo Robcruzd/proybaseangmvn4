@@ -40,9 +40,11 @@ pipeline {
             //     }
             // }
             steps {
-                sh "chmod +x mvnw"
-                sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
-                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                script {
+                    sh "chmod +x mvnw"
+                    sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
+                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                }
             }
             // post {
             //     always {
