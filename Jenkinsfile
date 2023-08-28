@@ -43,7 +43,7 @@ pipeline {
                 script {
                     sh "chmod +x mvnw"
                     sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
-                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                    // archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
                     stash name: 'jar', includes: '**/target/*.jar'
                     sh "find . -name proy*.jar"
                 }
@@ -72,7 +72,7 @@ pipeline {
                         sh '''
                             find . -name proy*.jar
                             az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-                            az webapp deploy --resource-group proybase --name proybaseappserv --src-path ./target/proybaseangmvn-4-0.0.1-SNAPSHOT.jar --type jar --verbose
+                            az webapp deploy --resource-group proybase --name proybaseappserv --src-path $(find . -name "proy*.jar") --type jar --verbose
                         '''
                     }
                 }
