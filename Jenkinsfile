@@ -62,12 +62,14 @@ pipeline {
             }
             agent any
             steps {
+                unstash 'jar'
                 // attachWorkspace()
                 script {
                     withCredentials([string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
                                      string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
                                      string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')]) {
                         sh '''
+                            find . -name proy*.jar
                             az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
                             az webapp deploy --resource-group proybase --name proybaseappserv --src-path ./target/proybaseangmvn-4-0.0.1-SNAPSHOT.jar --type jar --verbose
                         '''
