@@ -44,6 +44,7 @@ pipeline {
                     sh "chmod +x mvnw"
                     sh "./mvnw -ntp verify -P-webapp -Pprod -DskipTests"
                     archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                    stash name: 'jar', includes: '**/target/*.jar'
                     sh "find . -name proy*.jar"
                 }
             }
