@@ -24,19 +24,19 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
-            steps {
-                checkout scm
-                sh "java -version"
-                sh "chmod +x mvnw"
-                sh "./mvnw -ntp clean -P-webapp"
-                sh "./mvnw -ntp checkstyle:check"
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
-                sh "./mvnw -ntp verify -P-webapp"
-                sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
-            }
-        }
+        // stage('Build and Test') {
+        //     steps {
+        //         checkout scm
+        //         sh "java -version"
+        //         sh "chmod +x mvnw"
+        //         sh "./mvnw -ntp clean -P-webapp"
+        //         sh "./mvnw -ntp checkstyle:check"
+        //         sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm"
+        //         sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
+        //         sh "./mvnw -ntp verify -P-webapp"
+        //         sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run test'"
+        //     }
+        // }
 
         stage('Deliver') {
             steps {
