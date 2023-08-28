@@ -33,9 +33,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/proybaseangmvn4
-    username: proybaseangmvn4
-    password:
+    url: jdbc:postgresql://proybasedbi.cyfwy4s84foc.us-east-2.rds.amazonaws.com:5432/prybasedb
+    username: postgres
+    password: ProyBaseJ4v3
     hikari:
       poolName: Hikari
       auto-commit: false
