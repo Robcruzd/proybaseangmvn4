@@ -8,7 +8,6 @@ pipeline {
         CONTAINER_REGISTRY = 'proybaseazcr.azurecr.io'
         CONTAINER_REGISTRY_USERNAME = 'proybaseazcr'
         IMAGE_REPOSITORY = 'proybase_image'
-        TAG = env.CIRCLE_TAG
         AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
         AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
         AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
@@ -43,7 +42,8 @@ pipeline {
                 withCredentials([string(credentialsId: 'CONTAINER_REGISTRY_PASSWORD', variable: 'CONTAINER_REGISTRY_PASSWORD')]) {
                     sh "echo \$CONTAINER_REGISTRY_PASSWORD | docker login \$CONTAINER_REGISTRY --username \$CONTAINER_REGISTRY_USERNAME --password-stdin"
                 }
-                sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$CIRCLE_WORKFLOW_ID"
+                def timestamp = new Date().format("yyyyMMddHHmmss")
+                sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$timestamp"
 
             }
         }
@@ -63,7 +63,8 @@ pipeline {
                 ]) {
                     sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
                 }
-                sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$CIRCLE_WORKFLOW_ID\""
+                def timestamp = new Date().format("yyyyMMddHHmmss")
+                sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$timestamp\""
                 sh 'az logout'
             }
         }
