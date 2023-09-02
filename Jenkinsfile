@@ -43,9 +43,9 @@ pipeline {
                     sh "echo \$CONTAINER_REGISTRY_PASSWORD | docker login \$CONTAINER_REGISTRY --username \$CONTAINER_REGISTRY_USERNAME --password-stdin"
                 }
                 script {
-                    def timestamp = new Date().format("yyyyMMddHHmmss")
+                    def tag = new Date().format("yyyyMMddHHmmss")
+                    sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$tag"
                 }
-                sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$timestamp"
 
             }
         }
@@ -65,9 +65,8 @@ pipeline {
                 ]) {
                     sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
                 }
-                script {
-                    def timestamp = new Date().format("yyyyMMddHHmmss")
-                }                sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$timestamp\""
+                // def timestamp = new Date().format("yyyyMMddHHmmss")
+                sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$timestamp\""
                 sh 'az logout'
             }
         }
