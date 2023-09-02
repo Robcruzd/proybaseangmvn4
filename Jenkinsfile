@@ -50,7 +50,7 @@ pipeline {
                     def tag = "${versionNumber}-${timestamp}"
 
                     // Establecer la variable de entorno 'tag' para que esté disponible en otros pasos
-                    currentBuild.buildVariables.TAG = tag
+                    // currentBuild.buildVariables.TAG = tag
 
                     echo "Tag calculada: ${tag}"
                 }
