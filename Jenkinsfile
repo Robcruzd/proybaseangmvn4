@@ -52,7 +52,8 @@ pipeline {
                     // Establecer la variable de entorno 'tag' para que esté disponible en otros pasos
                     // currentBuild.buildVariables.TAG = tag
 
-                    echo "Tag calculada: ${tag}"
+                    echo "Tag calculada $env.BUILD_NUMBER: ${tag}"
+                    // sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$env.BUIL"
                 }
             }
             // steps {
