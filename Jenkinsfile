@@ -39,44 +39,62 @@ pipeline {
 
         stage('Deliver') {
             steps {
-                // withCredentials([string(credentialsId: 'CONTAINER_REGISTRY_PASSWORD', variable: 'CONTAINER_REGISTRY_PASSWORD')]) {
-                //     sh "echo \$CONTAINER_REGISTRY_PASSWORD | docker login \$CONTAINER_REGISTRY --username \$CONTAINER_REGISTRY_USERNAME --password-stdin"
-                // }
-                sh "echo \$CONTAINER_REGISTRY_PASSWORD | docker login \$CONTAINER_REGISTRY --username \$CONTAINER_REGISTRY_USERNAME --password-stdin"
-
                 script {
-                    def tag = new Date().format("yyyyMMddHHmmss")
-                    sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\${tag}"
-                }
+                    // Obtener la fecha y hora actual
+                    def timestamp = new Date().format("yyyyMMddHHmmss")
 
+                    // Definir el formato de versión (puedes personalizarlo)
+                    def versionNumber = '1.0.0'
+
+                    // Crear la etiqueta combinando la versión y la marca de tiempo
+                    def tag = "${versionNumber}-${timestamp}"
+
+                    // Establecer la variable de entorno 'tag' para que esté disponible en otros pasos
+                    currentBuild.buildVariables.TAG = tag
+
+                    echo "Tag calculada: ${tag}"
+                }
             }
+            // steps {
+            //     // withCredentials([string(credentialsId: 'CONTAINER_REGISTRY_PASSWORD', variable: 'CONTAINER_REGISTRY_PASSWORD')]) {
+            //     //     sh "echo \$CONTAINER_REGISTRY_PASSWORD | docker login \$CONTAINER_REGISTRY --username \$CONTAINER_REGISTRY_USERNAME --password-stdin"
+            //     // }
+            //     // sh "echo \$CONTAINER_REGISTRY_PASSWORD | docker login \$CONTAINER_REGISTRY --username \$CONTAINER_REGISTRY_USERNAME --password-stdin"
+
+            //     script {
+            //         def tag = new Date().format("yyyyMMddHHmmss")
+            //         sh ""
+            //         // sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\${tag}"
+            //     }
+
+            // }
         }
 
-        stage('Deploy') {
-            environment {
-                AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
-                AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
-                AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
-            }
-            agent any
-            steps {
-                // withCredentials([
-                //     string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
-                //     string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
-                //     string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')
-                // ]) {
-                //     sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
-                // }
-                sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
-                // def timestamp = new Date().format("yyyyMMddHHmmss")
-                script {
-                    def tag = new Date().format("yyyyMMddHHmmss")
-                    sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\${tag}\""
-                }
+        // stage('Deploy') {
+        //     environment {
+        //         AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
+        //         AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
+        //         AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
+        //     }
+        //     agent any
+        //     steps {
+        //         // withCredentials([
+        //         //     string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
+        //         //     string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
+        //         //     string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')
+        //         // ]) {
+        //         //     sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
+        //         // }
+        //         sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
+        //         // def timestamp = new Date().format("yyyyMMddHHmmss")
+        //         script {
+        //             def tag = new Date().format("yyyyMMddHHmmss")
+        //             sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\${tag}\""
+        //         }
                 
-                sh 'az logout'
-            }
-        }
+        //         sh 'az logout'
+        //     }
+        // }
     }
 
     post {
