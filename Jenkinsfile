@@ -46,7 +46,7 @@ pipeline {
 
                 script {
                     def tag = new Date().format("yyyyMMddHHmmss")
-                    sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$tag"
+                    sh "./mvnw package -Pprod verify jib:build -Djib.to.image=\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\${tag}"
                 }
 
             }
@@ -71,7 +71,7 @@ pipeline {
                 // def timestamp = new Date().format("yyyyMMddHHmmss")
                 script {
                     def tag = new Date().format("yyyyMMddHHmmss")
-                    sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\$tag\""
+                    sh "az webapp create --resource-group \"\$AZURE_RESOURCE_GROUP\" --plan \"\$AZURE_APP_SERVICE_PLAN\" --name \"\$AZURE_APP_NAME\" --deployment-container-image-name \"\$CONTAINER_REGISTRY/\$IMAGE_REPOSITORY:\${tag}\""
                 }
                 
                 sh 'az logout'
