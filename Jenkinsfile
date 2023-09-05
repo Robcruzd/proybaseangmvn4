@@ -1,12 +1,7 @@
 #!/usr/bin/env groovy
 
 pipeline {
-    agent {
-        docker {
-            image 'ubuntu:20.04'
-            args '-u root'  // Esto permite ejecutar comandos como el usuario root
-        }
-    }
+    agent any
 
     environment {
         CONTAINER_REGISTRY_PASSWORD = 'n4yPSHC3s9lxYOfGXB3joVxVOssE7+vfrXcLGuGFr5+ACRDQeGic'
@@ -65,28 +60,33 @@ pipeline {
         // }
 
         stage('Deploy') {
-            // agent {
-            //     docker {
-            //         image 'ubuntu:20.04'
-            //     }
-            // }
-
             steps {
-                checkout scm
-                sh '''
-                    curl -sL https://aka.ms/InstallAzureCLIDeb | bash
-                    curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-                    chmod +x ./kubectl
-                    mv ./kubectl /usr/local/bin/kubectl
-                '''
-                sh "echo \"\${CONTAINER_REGISTRY_PASSWORD}\" | docker login --username \${CONTAINER_REGISTRY_USERNAME} --password-stdin \${CONTAINER_REGISTRY}"
-                sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
-                sh "az aks get-credentials --resource-group \"\$AZURE_RESOURCE_GROUP\" --name \"\$CLUSTER_NAME\""
-                sh '''
-                    kubectl apply -f deployment.yml -f service.yml
-                    kubectl set image deployment/robcruzdproybaseangmvn $CONTAINER_REGISTRY_USERNAME=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:51
-                '''
-                sh 'az logout'
+                script {
+                    // Ejecuta los comandos Docker dentro de un contenedor
+                    container('docker') {
+                        sh '''
+                            curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+                            curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+                            chmod +x ./kubectl
+                            mv ./kubectl /usr/local/bin/kubectl
+                        '''
+                    }
+                }
+                // checkout scm
+                // sh '''
+                //     curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+                //     curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+                //     chmod +x ./kubectl
+                //     mv ./kubectl /usr/local/bin/kubectl
+                // '''
+                // sh "echo \"\${CONTAINER_REGISTRY_PASSWORD}\" | docker login --username \${CONTAINER_REGISTRY_USERNAME} --password-stdin \${CONTAINER_REGISTRY}"
+                // sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
+                // sh "az aks get-credentials --resource-group \"\$AZURE_RESOURCE_GROUP\" --name \"\$CLUSTER_NAME\""
+                // sh '''
+                //     kubectl apply -f deployment.yml -f service.yml
+                //     kubectl set image deployment/robcruzdproybaseangmvn $CONTAINER_REGISTRY_USERNAME=$CONTAINER_REGISTRY/$IMAGE_REPOSITORY:51
+                // '''
+                // sh 'az logout'
             }
         }
     }
