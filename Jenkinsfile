@@ -13,7 +13,7 @@ pipeline {
         AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
         AZURE_RESOURCE_GROUP = 'proybase'
         AZURE_APP_SERVICE_PLAN = 'proybaseappservplan'
-        CLUSTER_NAME: 'proybasecluster'
+        CLUSTER_NAME = 'proybasecluster'
     }
 
     stages {
