@@ -63,10 +63,10 @@ pipeline {
             steps {
                 checkout scm
                 sh '''
-                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                    curl -sL https://aka.ms/InstallAzureCLIDeb | bash
                     curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
                     chmod +x ./kubectl
-                    sudo mv ./kubectl /usr/local/bin/kubectl
+                    mv ./kubectl /usr/local/bin/kubectl
                 '''
                 sh "echo \"\${CONTAINER_REGISTRY_PASSWORD}\" | docker login --username \${CONTAINER_REGISTRY_USERNAME} --password-stdin \${CONTAINER_REGISTRY}"
                 sh "az login --service-principal --username \$AZURE_CLIENT_ID --password \$AZURE_CLIENT_SECRET --tenant \$AZURE_TENANT_ID"
