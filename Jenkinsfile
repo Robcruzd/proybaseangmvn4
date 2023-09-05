@@ -60,6 +60,12 @@ pipeline {
         // }
 
         stage('Deploy') {
+            agent {
+                docker {
+                    image 'ubuntu:20.04'
+                }
+            }
+
             steps {
                 checkout scm
                 sh '''
