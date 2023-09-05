@@ -1,7 +1,12 @@
 #!/usr/bin/env groovy
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'ubuntu:20.04'
+            args '-u root'  // Esto permite ejecutar comandos como el usuario root
+        }
+    }
 
     environment {
         CONTAINER_REGISTRY_PASSWORD = 'n4yPSHC3s9lxYOfGXB3joVxVOssE7+vfrXcLGuGFr5+ACRDQeGic'
@@ -60,11 +65,11 @@ pipeline {
         // }
 
         stage('Deploy') {
-            agent {
-                docker {
-                    image 'ubuntu:20.04'
-                }
-            }
+            // agent {
+            //     docker {
+            //         image 'ubuntu:20.04'
+            //     }
+            // }
 
             steps {
                 checkout scm
